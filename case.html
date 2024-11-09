@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case</title>
+    <!-- Весь css проекта -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        #canvas {
+            width: 80vw;
+            height: 60vh;
+            border: 1px solid #ccc;
+            position: relative;
+            overflow: hidden;
+            background-color: white;
+        }
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            background-color: #00b0f0;
+            cursor: pointer;
+        }
+        button {
+            background-color: #00b0f0;
+            color: white;
+            margin-bottom: 10px;
+            border: 2px solid #00b0f0;
+            border-radius: 2px;
+            padding: 10px 20px;
+        }
+    </style>
+    <!-- Конец сss -->
+</head>
+<body>
+    <!-- Добаваляем кнопку  -->
+<button id="addCircleButton">Добавить круг</button>  
+<div id="canvas"></div>
+
+<script>
+    const canvas = document.getElementById('canvas');
+    const addCircleButton = document.getElementById('addCircleButton');
+    let currentCircle = null;  // проверка текущего шара и нхаодиться ли он в движении мышкой
+    let isDragging = false;    // 
+
+    addCircleButton.addEventListener('click', addCircle);
+
+
+    function addCircle() {
+        
+            // Удаляем круг
+        if (currentCircle) {
+            canvas.removeChild(currentCircle);
+            currentCircle = null; // 
+        }
+
+        // добавляем круг
+        const circle = document.createElement('div');
+        const canvasWidth = canvas.clientWidth;
+        const canvasHeight = canvas.clientHeight;
+
+        // Рандомизатор размера
+        const size = Math.random() * (0.2 - 0.05) + 0.05; 
+        const diameter = canvasWidth * size;
+
+        // Случайная позиция на холсте
+        const x = Math.random() * (canvasWidth - diameter);
+        const y = Math.random() * (canvasHeight - diameter);
+
+        circle.classList.add('circle');
+        circle.style.width = `${diameter}px`;
+        circle.style.height = `${diameter}px`;
+        circle.style.left = `${x}px`;
+        circle.style.top = `${y}px`;
+
+        // Функционал, отвечающий за передвижение кружка внутри холста
+        circle.onmousedown = function (event) {
+            if (!isDragging) {
+                isDragging = true; // Start dragging
+                let shiftX = event.clientX - circle.getBoundingClientRect().left;
+                let shiftY = event.clientY - circle.getBoundingClientRect().top;
+
+                function moveAt(pageX, pageY) {
+                    circle.style.left = pageX - shiftX + 'px';
+                    circle.style.top = pageY - shiftY + 'px';
+                }
+
+                function onMouseMove(event) {
+                    moveAt(event.pageX, event.pageY);
+                }
+
+                document.addEventListener('mousemove', onMouseMove);
+
+                circle.onmouseup = function () {
+                    isDragging = false; 
+                    document.removeEventListener('mousemove', onMouseMove);
+                    circle.onmouseup = null; 
+                };
+            } else {
+                // раняем круг 
+                isDragging = false; 
+                circle.onmouseup = null; // Подчищаем
+            }
+        };
+
+        circle.ondragstart = function() {
+            return false; 
+        };
+
+        currentCircle = circle; 
+        canvas.appendChild(circle); 
+    }
+</script>
+
+</body>
+</html>
